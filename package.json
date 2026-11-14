@@ -1,0 +1,22 @@
+{
+  "name": "queue-management-application",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Full-stack queue management app: managers create queues, issue tokens, reorder, serve, cancel, and track analytics.",
+  "scripts": {
+    "install:all": "npm install --prefix server && npm install --prefix client",
+    "dev": "concurrently -n server,client -c blue,magenta \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "build": "npm run build --prefix client",
+    "start": "npm start --prefix server",
+    "seed": "npm run seed --prefix server",
+    "test": "npm test --prefix server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "author": "Keerthana Thummala",
+  "license": "MIT"
+}
