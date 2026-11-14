@@ -5,6 +5,7 @@ import cors from 'cors';
 import { config } from './config.js';
 import { authRouter } from './auth.js';
 import { queueRouter } from './queues.js';
+import { analyticsRouter } from './analytics.js';
 import { errorMiddleware } from './errors.js';
 
 export function createApp() {
@@ -14,6 +15,7 @@ export function createApp() {
 
   app.get('/api/health', (_req, res) => res.json({ ok: true }));
   app.use('/api/auth', authRouter);
+  app.use('/api/analytics', analyticsRouter);
   app.use('/api', queueRouter);
 
   app.use('/api', (_req, res) => res.status(404).json({ error: 'Endpoint not found' }));
