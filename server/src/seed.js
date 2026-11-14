@@ -10,6 +10,9 @@ import { load, save, db, newId } from './db.js';
 import { createUser } from './auth.js';
 import { STATUS } from './queues.js';
 
+const localDay = (d) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
 const DEMO_EMAIL = 'demo@queue.app';
 const MIN = 60_000;
 
@@ -49,6 +52,7 @@ function simulateDay(queue, dayStart, nowMs, { counters, load, serviceMean, pati
       arrivals.push(t);
     }
   }
+  queue.nextNumber = 1; // token numbers restart every day, like a real ticket roll
   const free = Array(counters).fill(dayStart + 9 * 60 * MIN);
   const live = [];
   for (const arrivedAt of arrivals) {
@@ -158,6 +162,7 @@ export function seedDemo({ days = 30, nowMs = Date.now() } = {}) {
       live.push(token);
     }
     live.forEach((t, i) => (t.position = i + 1));
+    queue.numberDay = localDay(new Date(nowMs));
   });
   save();
   return user;

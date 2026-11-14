@@ -55,6 +55,21 @@ function ownToken(req) {
   return token;
 }
 
+const localDay = (d = new Date()) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+/**
+ * Token numbers restart at 1 each day (like a ticket roll), but only once the line from the
+ * previous day has cleared, so two active tokens can never share a code.
+ */
+function upcomingNumber(queue) {
+  if (queue.numberDay === localDay()) return queue.nextNumber;
+  const active = db.tokens.some(
+    (t) => t.queueId === queue.id && (t.status === STATUS.WAITING || t.status === STATUS.SERVING),
+  );
+  return active ? queue.nextNumber : 1;
+}
+
 const waitingTokens = (queueId) =>
   db.tokens.filter((t) => t.queueId === queueId && t.status === STATUS.WAITING).sort((a, b) => a.position - b.position);
 
@@ -69,6 +84,7 @@ function queueSummary(queue) {
   const waiting = tokens.filter((t) => t.status === STATUS.WAITING);
   return {
     ...queue,
+    nextNumber: upcomingNumber(queue),
     waitingCount: waiting.length,
     servingCount: tokens.filter((t) => t.status === STATUS.SERVING).length,
     servedToday: servedToday.length,
@@ -122,6 +138,7 @@ queueRouter.post(
       description,
       prefix,
       nextNumber: 1,
+      numberDay: localDay(),
       createdAt: now(),
     };
     db.queues.push(queue);
@@ -180,7 +197,9 @@ queueRouter.post(
     const note = cleanText(req.body?.note, { field: 'Note', max: 140 });
     if (phone && !/^[+\d][\d\s()-]{2,19}$/.test(phone)) throw badRequest('Phone number looks invalid');
     const waiting = waitingTokens(queue.id);
-    const number = queue.nextNumber++;
+    const number = upcomingNumber(queue);
+    queue.nextNumber = number + 1;
+    queue.numberDay = localDay();
     const token = {
       id: newId(),
       queueId: queue.id,
