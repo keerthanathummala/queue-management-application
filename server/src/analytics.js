@@ -76,20 +76,25 @@ export function computeAnalytics({ tokens, queues, range = '7d', tzOffset = 0, n
     const end = Math.min(start + cfg.bucket, nowMs);
     const within = (iso) => iso && ms(iso) >= start && ms(iso) < start + cfg.bucket;
     const bucketWaits = tokens.filter((t) => within(t.calledAt)).map(waitMinutes);
-    // Sample queue length several times within the bucket to get both the average and the peak.
+    // Sample queue length across the part of the bucket where the queue was active (first arrival
+    // to last departure), so overnight hours don't dilute the daily average.
+    const touched = tokens.filter((t) => ms(t.createdAt) < start + cfg.bucket && (leftLineAt(t) ?? Infinity) >= start);
+    const activeFrom = Math.max(start, Math.min(...touched.map((t) => ms(t.createdAt)), end));
+    const activeTo = Math.min(end, Math.max(...touched.map((t) => leftLineAt(t) ?? nowMs), activeFrom));
     const samples = [];
-    const steps = 12;
-    for (let s = 1; s <= steps; s++) {
-      const at = start + ((end - start) * s) / steps;
+    const steps = cfg.bucket === HOUR ? 12 : 48;
+    for (let s = 0; s <= steps; s++) {
+      const at = activeFrom + ((activeTo - activeFrom) * s) / steps;
       samples.push(tokens.filter((t) => inLineAt(t, at)).length);
     }
+    const lengthAtEnd = tokens.filter((t) => inLineAt(t, end)).length;
     trend.push({
       start: new Date(start).toISOString(),
       arrivals: tokens.filter((t) => within(t.createdAt)).length,
       served: tokens.filter((t) => t.status === STATUS.SERVED && within(t.completedAt)).length,
       cancelled: tokens.filter((t) => t.status === STATUS.CANCELLED && within(t.cancelledAt)).length,
       avgWait: round1(mean(bucketWaits)),
-      queueLength: samples[samples.length - 1],
+      queueLength: lengthAtEnd,
       avgQueueLength: round1(mean(samples)),
       peakQueueLength: Math.max(...samples),
     });
