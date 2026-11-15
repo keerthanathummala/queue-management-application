@@ -2,6 +2,8 @@
 
 A full-stack queue management app for service counters. A queue manager logs in, creates queues, issues tokens to people as they arrive, reorders the line, calls the next person with one click, cancels tokens, and tracks wait times and queue trends on an analytics dashboard.
 
+> **Review only.** You may read this code and try the demo. Downloading, forking or reusing it needs permission from k.thummala08@gmail.com. See [LICENSE](LICENSE).
+
 **Live demo:** https://keerthanathummala.github.io/queue-management-application/. Click **Use the demo account**, or sign up with any email.
 
 > The live demo runs entirely in your browser: GitHub Pages can only host static files, so the demo build swaps the Express server for an in-browser backend that runs the same queue and analytics code, with data saved in `localStorage`. To run the real full-stack version with the Node server, follow [Getting started](#getting-started).
@@ -150,6 +152,12 @@ Errors come back as `{ "error": "message" }` with the right status code: 400 for
 - **Service time** is the time from being called to being marked served.
 - **Queue length** is the number of tokens in the waiting line at a moment. Each hour or day is sampled across its active period to get the average and the peak.
 - Hour and day buckets use the viewer's time zone.
+
+## Licence and permissions
+
+Copyright © 2026 Keerthana Thummala. All rights reserved.
+
+This code is shared for **review only**. You're welcome to read it and try the live demo. Downloading, cloning, forking, copying or reusing any part of it needs written permission. To ask, email **k.thummala08@gmail.com**. See [LICENSE](LICENSE).
 
 ## Author
 
