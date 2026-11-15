@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:pages": "cross-env VITE_DEMO=1 VITE_BASE=/queue-management-application/ vite build && node -e \"require('fs').copyFileSync('dist/index.html','dist/404.html')\"",
+    "dev:demo": "cross-env VITE_DEMO=1 vite"
   },
   "dependencies": {
     "react": "^18.3.1",
@@ -16,6 +18,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
-    "vite": "^5.4.11"
+    "vite": "^5.4.11",
+    "cross-env": "^7.0.3"
   }
 }

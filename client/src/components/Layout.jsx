@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { api } from '../api.js';
+import { api, DEMO } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import { TicketMark } from './Ticket.jsx';
 
@@ -61,12 +61,28 @@ export default function Layout() {
             </NavLink>
           ))}
         </nav>
+        {DEMO && (
+          <div className="rail-demo">
+            <p>Demo mode: data is saved in this browser only.</p>
+            <button
+              className="btn-link-light"
+              onClick={async () => {
+                if (!window.confirm('Reset the demo? All queues and accounts in this browser go back to the sample data.')) return;
+                const { resetDemo } = await import('../demoApi.js');
+                await resetDemo();
+                logout({ explicit: true });
+              }}
+            >
+              Reset demo data
+            </button>
+          </div>
+        )}
         <div className="rail-foot">
           <div className="rail-user">
             <strong>{user?.name}</strong>
             <span>{user?.email}</span>
           </div>
-          <button className="btn-ghost-light" onClick={logout}>
+          <button className="btn-ghost-light" onClick={() => logout({ explicit: true })}>
             Log out
           </button>
         </div>

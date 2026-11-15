@@ -1,5 +1,8 @@
 const TOKEN_KEY = 'queuedesk.token';
 
+/** True in the GitHub Pages build, where a browser-only backend replaces the server. */
+export const DEMO = import.meta.env.VITE_DEMO === '1';
+
 export const session = {
   get() {
     try {
@@ -33,6 +36,16 @@ export async function api(path, { method = 'GET', body, auth = true } = {}) {
   if (body !== undefined) headers['Content-Type'] = 'application/json';
   const token = session.get();
   if (auth && token) headers.Authorization = `Bearer ${token}`;
+
+  if (DEMO) {
+    const { demoRequest } = await import('./demoApi.js');
+    const { status, data } = await demoRequest(path, { method, body, token: auth ? token : undefined });
+    if (status >= 400) {
+      if (status === 401 && auth) onUnauthorized();
+      throw new ApiError(status, data?.error || `Request failed (${status})`);
+    }
+    return status === 204 ? null : data;
+  }
 
   let res;
   try {

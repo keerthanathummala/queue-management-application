@@ -1206,3 +1206,40 @@ code {
     border-left: 1px solid var(--line-soft);
   }
 }
+
+/* ---------- Demo mode (GitHub Pages build) ---------- */
+.demo-note {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 10px;
+  background: var(--amber-soft);
+}
+.demo-note p {
+  margin: 0;
+  font-size: var(--step--1);
+  color: #4d3a06;
+}
+.rail-demo {
+  margin: 8px 6px 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(245, 184, 46, 0.12);
+  font-size: var(--step--1);
+  color: #e9dcb8;
+}
+.rail-demo p {
+  margin: 0 0 4px;
+}
+.rail-demo .btn-link-light {
+  padding: 0;
+  color: var(--amber);
+}
+@media (max-width: 900px) {
+  .rail-demo {
+    display: none;
+  }
+  .rail.open .rail-demo {
+    display: block;
+  }
+}

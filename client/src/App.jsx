@@ -7,10 +7,10 @@ import QueuePage from './pages/QueuePage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
 
 function RequireAuth({ children }) {
-  const { user, checking } = useAuth();
+  const { user, checking, signedOut } = useAuth();
   const location = useLocation();
   if (checking) return <div className="boot">Loading…</div>;
-  if (!user) return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  if (!user) return <Navigate to="/login" replace state={signedOut ? undefined : { from: location.pathname }} />;
   return children;
 }
 

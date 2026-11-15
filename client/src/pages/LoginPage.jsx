@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth.jsx';
 import { TicketMark } from '../components/Ticket.jsx';
+import { DEMO } from '../api.js';
 
 export default function LoginPage() {
   const { login, register } = useAuth();
@@ -22,6 +23,19 @@ export default function LoginPage() {
     try {
       if (mode === 'login') await login(form.email, form.password);
       else await register(form.name, form.email, form.password);
+      navigate(location.state?.from || '/', { replace: true });
+    } catch (err) {
+      setError(err.message);
+      setBusy(false);
+    }
+  }
+
+  async function loginAsDemo() {
+    setForm({ name: '', email: 'demo@queue.app', password: 'demo1234' });
+    setError('');
+    setBusy(true);
+    try {
+      await login('demo@queue.app', 'demo1234');
       navigate(location.state?.from || '/', { replace: true });
     } catch (err) {
       setError(err.message);
@@ -112,12 +126,24 @@ export default function LoginPage() {
             {busy ? 'Please wait…' : mode === 'login' ? 'Log in' : 'Create account'}
           </button>
 
-          {mode === 'login' && (
-            <p className="hint">
-              Trying it out? Run <code>npm run seed</code> and log in as <strong>demo@queue.app</strong> with
-              password <strong>demo1234</strong>.
-            </p>
-          )}
+          {mode === 'login' &&
+            (DEMO ? (
+              <div className="demo-note">
+                <p>
+                  This is a live demo. Everything you do is saved only in this browser. Log in as{' '}
+                  <strong>demo@queue.app</strong> / <strong>demo1234</strong> to see 30 days of sample data, or sign
+                  up with any email.
+                </p>
+                <button type="button" className="btn btn-block" onClick={loginAsDemo} disabled={busy}>
+                  Use the demo account
+                </button>
+              </div>
+            ) : (
+              <p className="hint">
+                Trying it out? Run <code>npm run seed</code> and log in as <strong>demo@queue.app</strong> with
+                password <strong>demo1234</strong>.
+              </p>
+            ))}
         </form>
       </section>
     </div>
