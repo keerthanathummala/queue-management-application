@@ -2,6 +2,10 @@
 
 A full-stack queue management app for service counters. A queue manager logs in, creates queues, issues tokens to people as they arrive, reorders the line, calls the next person with one click, cancels tokens, and tracks wait times and queue trends on an analytics dashboard.
 
+**Live demo:** https://keerthanathummala.github.io/queue-management-application/. Click **Use the demo account**, or sign up with any email.
+
+> The live demo runs entirely in your browser: GitHub Pages can only host static files, so the demo build swaps the Express server for an in-browser backend that runs the same queue and analytics code, with data saved in `localStorage`. To run the real full-stack version with the Node server, follow [Getting started](#getting-started).
+
 ![Queue desk](docs/screenshots/queue.png)
 
 ## Features
@@ -69,6 +73,15 @@ Open **http://localhost:4000**.
 
 After `npm run seed`, log in with **demo@queue.app** / **demo1234**. Or click **Sign up** to create your own manager account.
 
+### Browser-only demo build
+
+```bash
+npm run dev:demo --prefix client      # demo mode with hot reload, no server needed
+npm run build:pages --prefix client   # the build GitHub Pages serves
+```
+
+The workflow in `.github/workflows/deploy-pages.yml` publishes the demo on every push to `main`.
+
 ### Tests
 
 ```bash
@@ -114,15 +127,19 @@ Errors come back as `{ "error": "message" }` with the right status code: 400 for
 │       ├── pages/          Login, Queues, Queue desk, Dashboard
 │       ├── components/     Layout, modals, ticket stub, toasts, forms
 │       ├── api.js          fetch wrapper with auth
+│       ├── demoApi.js      in-browser backend for the GitHub Pages demo
 │       └── styles.css      design tokens and all styles
 ├── server/
 │   ├── src/
 │   │   ├── app.js          Express app
 │   │   ├── auth.js         register / login / JWT middleware
+│   │   ├── queueCore.js    queue and token rules (shared with the demo)
 │   │   ├── queues.js       queue and token endpoints
-│   │   ├── analytics.js    analytics computation
+│   │   ├── analyticsCore.js analytics computation (shared with the demo)
+│   │   ├── analytics.js    analytics endpoint
+│   │   ├── demoData.js     demo-data simulator (shared with the demo)
 │   │   ├── db.js           JSON-file persistence
-│   │   └── seed.js         demo-data simulator
+│   │   └── seed.js         npm run seed
 │   └── test/               API and analytics tests
 └── docs/screenshots/
 ```
